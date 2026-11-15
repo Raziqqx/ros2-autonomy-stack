@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.16)
+project(ekf_localization LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(ekf_core REQUIRED)
+find_package(icp_core REQUIRED)
+find_package(grid_core REQUIRED)
+
+add_executable(ekf_localization_node src/ekf_localization_node.cpp)
+target_compile_options(ekf_localization_node PRIVATE -Wall -Wextra -Wpedantic)
+target_link_libraries(ekf_localization_node ekf_core::ekf_core icp_core::icp_core grid_core::grid_core rclcpp::rclcpp tf2_ros::tf2_ros
+  ${geometry_msgs_TARGETS} ${nav_msgs_TARGETS} ${sensor_msgs_TARGETS})
+install(TARGETS ekf_localization_node DESTINATION lib/${PROJECT_NAME})
+ament_package()

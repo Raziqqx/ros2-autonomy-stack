@@ -11,7 +11,7 @@ COPY src ./src
 # log directory is dropped to keep the layer small.
 RUN source /opt/ros/jazzy/setup.bash \
     && colcon build --parallel-workers 4 --event-handlers console_cohesion+ \
-         --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTING=ON \
+         --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON \
     && rm -rf /ws/log
 
 COPY docker/entrypoint.sh /entrypoint.sh

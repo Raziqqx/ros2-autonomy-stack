@@ -93,6 +93,21 @@ struct StaticMap {
 // grid with an Amanatides-Woo DDA; returns max_range if nothing is hit.
 double raycast(const StaticMap& map, double x, double y, double angle, double max_range);
 
+// True if a disc of `radius` centred at (x, y) overlaps any occupied cell
+// (or leaves the map).
+bool discCollides(const StaticMap& map, double x, double y, double radius);
+
+struct Point2d {
+    double x = 0.0;
+    double y = 0.0;
+};
+
+// Points on the obstacle surface: the midpoint of every edge shared by an
+// occupied cell and a free 4-neighbour. These lie where a LiDAR beam actually
+// hits, unlike occupied cell centres (half a cell inside the wall), so they
+// are the right ICP target.
+std::vector<Point2d> surfacePoints(const StaticMap& map);
+
 // Loads a ROS map_server style YAML (image, resolution, origin, negate,
 // free_thresh) and its binary (P5) or ASCII (P2) PGM image.
 // Returns std::nullopt and fills `error` on failure.

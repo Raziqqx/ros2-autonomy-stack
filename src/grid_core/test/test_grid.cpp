@@ -129,6 +129,24 @@ TEST(Raycast, KnownDistances) {
     EXPECT_NEAR(raycast(m, 3.0, 5.0, M_PI, 20.0), 3.0, 1e-9);  // map edge counts as occupied
 }
 
+TEST(StaticMapHelpers, DiscCollisionAndSurfacePoints) {
+    StaticMap m;
+    m.geometry = {10, 10, 1.0, 0.0, 0.0};
+    m.occupied.assign(100, 0);
+    m.occupied[m.geometry.index({5, 5})] = 1;  // the unit square [5,6] x [5,6]
+    EXPECT_TRUE(discCollides(m, 4.6, 5.5, 0.5));
+    EXPECT_FALSE(discCollides(m, 4.4, 5.5, 0.5));
+    EXPECT_FALSE(discCollides(m, 4.6, 4.6, 0.5));  // corner distance 0.566
+    EXPECT_TRUE(discCollides(m, 0.3, 5.0, 0.5));   // leaves the map
+    const auto pts = surfacePoints(m);
+    ASSERT_EQ(pts.size(), 4u);  // one per face of the isolated cell
+    for (const auto& p : pts) {
+        const bool on_vertical_face = (p.x == 5.0 || p.x == 6.0) && p.y == 5.5;
+        const bool on_horizontal_face = (p.y == 5.0 || p.y == 6.0) && p.x == 5.5;
+        EXPECT_TRUE(on_vertical_face || on_horizontal_face) << p.x << "," << p.y;
+    }
+}
+
 class MapIoTest : public ::testing::Test {
 protected:
     void SetUp() override {

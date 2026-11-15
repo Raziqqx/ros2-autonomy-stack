@@ -104,4 +104,39 @@ double raycast(const StaticMap& map, double x, double y, double angle, double ma
     }
 }
 
+bool discCollides(const StaticMap& map, double x, double y, double radius) {
+    const GridGeometry& g = map.geometry;
+    const Cell lo = g.worldToCell(x - radius, y - radius),
+               hi = g.worldToCell(x + radius, y + radius);
+    for (int cy = lo.y; cy <= hi.y; ++cy)
+        for (int cx = lo.x; cx <= hi.x; ++cx) {
+            if (!map.isOccupied({cx, cy})) continue;
+            // Distance from the disc centre to the closest point of the cell.
+            const double x0 = g.origin_x + cx * g.resolution, y0 = g.origin_y + cy * g.resolution;
+            const double dx = std::max({x0 - x, 0.0, x - (x0 + g.resolution)});
+            const double dy = std::max({y0 - y, 0.0, y - (y0 + g.resolution)});
+            if (dx * dx + dy * dy < radius * radius) return true;
+        }
+    return false;
+}
+
+std::vector<Point2d> surfacePoints(const StaticMap& map) {
+    const GridGeometry& g = map.geometry;
+    std::vector<Point2d> pts;
+    constexpr int kDx[4] = {1, -1, 0, 0}, kDy[4] = {0, 0, 1, -1};
+    for (int cy = 0; cy < g.height; ++cy)
+        for (int cx = 0; cx < g.width; ++cx) {
+            if (!map.isOccupied({cx, cy})) continue;
+            double wx, wy;
+            g.cellToWorld({cx, cy}, wx, wy);
+            for (int k = 0; k < 4; ++k) {
+                const Cell n{cx + kDx[k], cy + kDy[k]};
+                if (g.inBounds(n) && !map.isOccupied(n))
+                    pts.push_back(
+                        {wx + 0.5 * kDx[k] * g.resolution, wy + 0.5 * kDy[k] * g.resolution});
+            }
+        }
+    return pts;
+}
+
 }  // namespace grid_core

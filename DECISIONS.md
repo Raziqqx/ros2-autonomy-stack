@@ -60,3 +60,34 @@ Decisions taken without asking, with the reason. Newest at the bottom.
     limits, braking-distance admissibility, normalised goal/heading/clearance/speed costs) as the
     obstacle-aware alternative. DWA returns `feasible = false` and a zero command when boxed in so
     the behaviour tree (run B) can trigger recovery.
+
+## ROS nodes and scenario test (run A)
+
+11. **Simulator noise model** (`config/sim.yaml`): the true robot follows `/cmd_vel` exactly;
+    wheel odometry has a 2 % scale error on v, a 0.02 rad/s bias on w and white noise per 50 Hz
+    sample, and reads exactly zero when the wheels are still. The systematic terms are what make
+    dead reckoning drift (0.87-1.04 m over the 8.8 m scenario in three runs), so the test exercises the
+    corrections rather than just averaging noise. The IMU yaw is absolute (AHRS-style) with
+    white noise. All randomness comes from one `std::mt19937` seeded by `seed`.
+12. **Collision handling in the sim**: a step that would make the robot disc overlap an occupied
+    cell is not applied (the robot stops and a warning is logged). Run B's recovery behaviour
+    relies on this "blocked" signal.
+13. **ICP target = obstacle surface points** (edge midpoints between occupied and free cells)
+    rather than occupied cell centres, which sit half a cell inside the wall and would bias
+    point-to-line ICP by up to 2.5 cm whenever only one side of the room is visible.
+14. **ICP acceptance** needs convergence, RMSE < 5 cm and >= 50 % inliers, then the EKF's own
+    3-DOF chi-square gate. Known simplification: the scan is matched at the latest EKF pose
+    (odometry at 50 Hz, so up to 20 ms of motion, < 1 cm at 0.4 m/s) without motion
+    compensation within the scan.
+15. **Mapping with known poses**: `grid_mapping` inserts a scan only if the latest EKF pose is
+    within 0.1 s of the scan stamp. It is not SLAM: map quality depends on the localiser.
+16. **Scenario test budgets** (`autonomy_bringup/test/test_localization_mapping.py`, seed 7):
+    max position error 0.10 m, RMS 0.05 m, max heading error 0.05 rad, > 500 occupied map cells,
+    ground-truth path >= 8 m. The measured run gave 0.012 m max / 0.004 m RMS / 0.026 rad
+    against 0.87-1.04 m of raw odometry drift, so the budgets leave margin for timing jitter on a slow
+    CI machine while still failing if ICP or the IMU update stops working (odometry alone
+    exceeds them by ~9x). The test uses wall-clock timers and an open-loop pattern, so the exact
+    trajectory varies slightly between runs; seeds fix the noise draws only.
+17. **Docker image**: workspace built in Release inside the image (colcon test needs the build
+    tree, so it stays in the image). `make docker-test` rebuilds the image so tests always run
+    against the current sources.

@@ -1,0 +1,21 @@
+# sim2d: robot, sensors and noise. Systematic odometry errors (scale, bias)
+# make dead reckoning drift; the white-noise terms are per 50 Hz sample.
+sim2d:
+  ros__parameters:
+    seed: 1
+    initial_x: 1.5
+    initial_y: 1.5
+    initial_theta: 0.0
+    robot_radius: 0.2
+    sim_rate: 50.0
+    scan_rate: 10.0
+    scan_beams: 360
+    range_min: 0.1
+    range_max: 8.0
+    scan_noise: 0.01
+    odom_v_scale: 1.02
+    odom_w_bias: 0.02
+    odom_v_noise: 0.05
+    odom_w_noise: 0.05
+    imu_yaw_noise: 0.02
+    imu_gyro_noise: 0.01
