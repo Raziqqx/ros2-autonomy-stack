@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>icp_core</name>
+  <version>0.1.0</version>
+  <description>ROS-free 2D point-to-point ICP scan matching.</description>
+  <maintainer email="dev@example.com">portfolio</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

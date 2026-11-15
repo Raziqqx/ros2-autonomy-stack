@@ -1,0 +1,16 @@
+# Google style with the two changes this code base was written with by hand
+# in M1: 4-space indentation and a 100-column limit.
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 100
+# "public:" / "private:" flush with the class keyword.
+AccessModifierOffset: -4
+# Pointer and reference bind to the type everywhere (no per-file guessing).
+DerivePointerAlignment: false
+PointerAlignment: Left
+# Keep the include blocks as written: own header first, then standard
+# library, then project headers.
+IncludeBlocks: Preserve
+# The JSON parser and the distributions use one-line "case X: return y;"
+# tables; keep them as tables.
+AllowShortCaseLabelsOnASingleLine: true
