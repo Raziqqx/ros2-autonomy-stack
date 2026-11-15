@@ -4,8 +4,8 @@ project(planning_core LANGUAGES CXX)
 # Shared shape of every *_core package: builds as an ament package under colcon,
 # or as a plain CMake project (native tests with GoogleTest from FetchContent,
 # usable under sanitizers without ROS installed).
-set(CORE_SOURCES src/grid_planners.cpp)
-set(CORE_TESTS test/test_planners.cpp)
+set(CORE_SOURCES src/grid_planners.cpp src/nav_planner.cpp)
+set(CORE_TESTS test/test_planners.cpp test/test_nav_planner.cpp)
 
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 20)

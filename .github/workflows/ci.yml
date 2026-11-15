@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  native-sanitizers:
+    # ROS-free core libraries under AddressSanitizer + UndefinedBehaviorSanitizer.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ninja-build cmake g++
+      - name: Build and test (ASan + UBSan)
+        run: make native-test JOBS=4
+
+  colcon:
+    # Every package (nodes, gtests, launch_testing scenarios, metrics pytest)
+    # in the same ROS 2 Jazzy base image the Dockerfile uses.
+    runs-on: ubuntu-latest
+    container: ros:jazzy-ros-base
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install BehaviorTree.CPP
+        run: apt-get update && apt-get install -y --no-install-recommends ros-jazzy-behaviortree-cpp
+      - name: Build
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          colcon build --base-paths src --event-handlers console_cohesion+ \
+            --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+      - name: Test
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          source install/setup.bash
+          colcon test --base-paths src --event-handlers console_cohesion+ \
+            --return-code-on-test-failure
+          colcon test-result --verbose

@@ -1,0 +1,32 @@
+# Navigation: global planner, local controller and behaviour tree. The
+# planner / controller choice and the mission are launch arguments
+# (see launch/navigation.launch.py).
+global_planner:
+  ros__parameters:
+    robot_radius: 0.2
+    lethal_margin: 0.0       # within radius + this of an obstacle = in collision
+    inflation_margin: 0.15   # paths keep this much clearance where possible
+    replan_period: 1.0       # s; picks up obstacles the LiDAR has mapped
+    goal_tolerance: 0.15
+    live_occupied_threshold: 65
+    live_ignore_radius: 0.1  # live hits this close to a prior wall are that wall
+
+local_controller:
+  ros__parameters:
+    rate: 10.0
+    v_max: 0.5
+    w_max: 1.5
+    goal_tolerance: 0.1
+    stuck_timeout: 1.0
+    pp_lookahead: 0.6
+    robot_radius: 0.2
+    dwa_horizon: 1.5
+    dwa_lookahead: 1.0
+
+task_bt:
+  ros__parameters:
+    goal_tolerance: 0.15
+    start_delay: 2.0
+    dock: [1.5, 1.5, 0.0]
+    waypoints: [5.0, 3.2, 0.0, 10.2, 6.6, 1.57, 3.0, 7.8, 3.14]
+    patrol_loops: 1

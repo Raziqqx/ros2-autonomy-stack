@@ -91,3 +91,52 @@ Decisions taken without asking, with the reason. Newest at the bottom.
 17. **Docker image**: workspace built in Release inside the image (colcon test needs the build
     tree, so it stays in the image). `make docker-test` rebuilds the image so tests always run
     against the current sources.
+
+## Navigation and task execution (run B)
+
+18. **BehaviorTree.CPP v4 from the ROS apt repo** (`ros-jazzy-behaviortree-cpp` 4.10), in its
+    own Dockerfile layer before `COPY src`, so source edits reuse it. FetchContent would add
+    a multi-minute compile to every image build. CMake links `${behaviortree_cpp_TARGETS}`
+    (the ament export), not `BT::behaviortree_cpp`, which the ROS package does not define.
+19. **Topic contract between the nodes**: `task_bt` sends `/goal_pose` (an empty `frame_id`
+    cancels); `global_planner` answers with `/plan` (empty = no goal or failure) and
+    `/planner/status`; `local_controller` follows `/plan` and reports
+    `idle | following | arrived | blocked` on `/controller/state`. The BT owns the mission
+    and recovery; the controller never recovers on its own. Recovery drives `/cmd_vel`
+    directly while the goal is cancelled, so there is never more than one active publisher
+    of motion commands. This is a much smaller version of the Nav2 action interfaces;
+    actions would add goal IDs and feedback, but topics keep the nodes easy to test.
+20. **`/goal_pose` is latched (transient local)** and the BT waits until the planner
+    subscribes. The first evaluation smoke test lost the initial goal when four stacks
+    started at once (slow discovery); the robot sat still for 90 s. Consequence: RViz's
+    SetGoal tool (volatile publisher) cannot send goals, so the RViz config omits it.
+21. **Planner on prior map + live map, replanned at 1 Hz.** Obstacles not in the prior map
+    (clutter, the dropped wall) only become known through `grid_mapping`. Live hits within
+    0.1 m of a prior obstacle are ignored: localisation and range noise smear walls by about
+    a cell, and counting that smear made the robot look in collision when it passed a shelf
+    corner (seen in the first smoke run). The cost is that new obstacles touching a known
+    wall are slightly underestimated.
+22. **Collision vs margin (`planning_core::planOnMap`)**: start within robot radius of an
+    obstacle = `start_in_collision` (a planner failure, so the BT recovers); start inside
+    the 0.15 m inflation margin but not in collision = plan anyway, using the un-inflated
+    grid near the start and goal. Otherwise any controller that cuts a corner (pure
+    pursuit does) would trigger a recovery. `lethal_margin` was 0.05 m at first; pure
+    pursuit cutting round the dropped wall then hit it repeatedly, so it is 0.
+23. **Stuck detection is in the controller** (`control_core::StuckDetector`): commanded
+    |v| > 0.05 m/s but wheel odometry < 0.01 m/s for 1 s, or DWA has had no admissible
+    velocity for 1 s. Wheel odometry is the right signal here because the sim's encoders
+    read exactly zero when the robot is pushed against something (decision 12).
+24. **BT shape**: `RetryUntilSuccessful(4)` over `Fallback(NavigateTo, ForceFailure(Recover))`,
+    with GoTo / Dock / Patrol trees sharing that subtree. Recover backs up 0.3 m and rotates
+    90 degrees (alternating direction) and then lets the retry replan. The tree logic is
+    unit-tested with mock leaves (`task_bt/test/test_trees.cpp`); the ROS leaves are covered
+    by the launch tests. `NavigateTo` checks arrival with the EKF pose (0.15 m), so it does
+    not depend on message ordering with the controller.
+25. **DWA local goal** is the point 1.0 m of arc length beyond the closest point on the path,
+    interpolated along segments, so it works on sparse Theta* paths as well as dense A*
+    paths. DWA obstacles are the scan endpoints within reach of the horizon.
+26. **sim2d evaluation knobs**: `noise_scale` scales every sensor error, including the
+    systematic odometry terms; `clutter_count` adds random 0.3-0.6 m boxes (seeded, kept 1 m
+    away from the start and goal) that are not in the prior map; `drop_after_m` drops a
+    1.6 m wall 0.45 m ahead of the robot after it has driven that far. The true world is
+    published on `/sim/world` for plots.

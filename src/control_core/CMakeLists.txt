@@ -4,8 +4,8 @@ project(control_core LANGUAGES CXX)
 # Shared shape of every *_core package: builds as an ament package under colcon,
 # or as a plain CMake project (native tests with GoogleTest from FetchContent,
 # usable under sanitizers without ROS installed).
-set(CORE_SOURCES src/pure_pursuit.cpp src/dwa.cpp)
-set(CORE_TESTS test/test_pure_pursuit.cpp test/test_dwa.cpp)
+set(CORE_SOURCES src/pure_pursuit.cpp src/dwa.cpp src/path_tracking.cpp)
+set(CORE_TESTS test/test_pure_pursuit.cpp test/test_dwa.cpp test/test_path_tracking.cpp)
 
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 20)

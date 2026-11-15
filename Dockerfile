@@ -1,8 +1,13 @@
 # One image for building, testing and running the stack headless.
 # ros-base (not desktop): no GUI/Gazebo, ~1.3 GB, and it already ships colcon,
-# ament_cmake_gtest, launch_testing and the message packages this stack uses,
-# so no extra apt layer is needed.
+# ament_cmake_gtest, launch_testing, rosbag2 and the message packages this
+# stack uses. The only addition is BehaviorTree.CPP v4 from the ROS apt repo
+# (~30 MB with its ZeroMQ deps), in its own layer so source edits reuse it.
 FROM ros:jazzy-ros-base
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ros-jazzy-behaviortree-cpp \
+    && rm -rf /var/lib/apt/lists/*
 
 SHELL ["/bin/bash", "-c"]
 WORKDIR /ws

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!-- Mission trees for task_bt. The node picks the main tree with its `tree`
+     parameter (GoTo | Dock | Patrol) and fills the blackboard with {goal},
+     {dock}, {waypoints} and {patrol_steps} from its parameters. -->
+<root BTCPP_format="4">
+
+  <!-- Go to {target}. If navigation fails (planner failure, blocked, or
+       timeout), back up and rotate, then try again: up to 4 attempts. -->
+  <BehaviorTree ID="NavigateWithRecovery">
+    <RetryUntilSuccessful num_attempts="4">
+      <Fallback>
+        <NavigateTo goal="{target}" timeout="90"/>
+        <ForceFailure>
+          <Recover backup_distance="0.3" rotate_angle="1.57"/>
+        </ForceFailure>
+      </Fallback>
+    </RetryUntilSuccessful>
+  </BehaviorTree>
+
+  <BehaviorTree ID="GoTo">
+    <SubTree ID="NavigateWithRecovery" target="{goal}"/>
+  </BehaviorTree>
+
+  <BehaviorTree ID="Dock">
+    <SubTree ID="NavigateWithRecovery" target="{dock}"/>
+  </BehaviorTree>
+
+  <!-- Visit the waypoints in order (patrol_steps = waypoints x loops), then dock. -->
+  <BehaviorTree ID="Patrol">
+    <Sequence>
+      <Repeat num_cycles="{patrol_steps}">
+        <Sequence>
+          <NextWaypoint waypoints="{waypoints}" goal="{target}"/>
+          <SubTree ID="NavigateWithRecovery" target="{target}"/>
+        </Sequence>
+      </Repeat>
+      <SubTree ID="NavigateWithRecovery" target="{dock}"/>
+    </Sequence>
+  </BehaviorTree>
+</root>

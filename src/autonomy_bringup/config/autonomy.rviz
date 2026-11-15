@@ -1,0 +1,58 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Reference Frame: map
+    - Class: rviz_default_plugins/Map
+      Name: Live map
+      Enabled: true
+      Topic:
+        Value: /map
+        Durability Policy: Transient Local
+      Alpha: 0.7
+    - Class: rviz_default_plugins/Map
+      Name: True world (sim)
+      Enabled: false
+      Topic:
+        Value: /sim/world
+        Durability Policy: Transient Local
+    - Class: rviz_default_plugins/LaserScan
+      Name: Scan
+      Enabled: true
+      Topic:
+        Value: /scan
+        Reliability Policy: Best Effort
+      Size (m): 0.04
+    - Class: rviz_default_plugins/Path
+      Name: Global plan
+      Enabled: true
+      Topic:
+        Value: /plan
+      Color: 27; 175; 122
+    - Class: rviz_default_plugins/Odometry
+      Name: Ground truth
+      Enabled: true
+      Topic:
+        Value: /ground_truth
+      Keep: 200
+    - Class: rviz_default_plugins/PoseWithCovariance
+      Name: EKF pose
+      Enabled: true
+      Topic:
+        Value: /ekf/pose
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+  Global Options:
+    Fixed Frame: map
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      X: 6
+      Y: 4.5
+      Scale: 60
