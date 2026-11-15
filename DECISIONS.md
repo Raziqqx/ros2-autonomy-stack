@@ -140,3 +140,29 @@ Decisions taken without asking, with the reason. Newest at the bottom.
     away from the start and goal) that are not in the prior map; `drop_after_m` drops a
     1.6 m wall 0.45 m ahead of the robot after it has driven that far. The true world is
     published on `/sim/world` for plots.
+
+## Evaluation (run B)
+
+27. **The evaluation runs the real ROS stack**, not a re-implementation in a lockstep loop.
+    Each run is `navigation.launch.py` plus `nav_recorder.py`; `run_eval.py` runs 6 at once on
+    separate `ROS_DOMAIN_ID`s with `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST`. It is slower (wall-clock
+    time, about 25-45 s per run) and not bit-reproducible, because timers and scheduling vary,
+    but it measures the code that ships. The grid is 2 noise levels x 2 clutter levels x 2 planners
+    x 2 controllers x 3 seeds (48 runs), plus 12 blocked-path runs: 6.2 min in total.
+28. **Metric definitions** (`nav_metrics.py`, unit-tested): ATE is the RMSE of the EKF position
+    against ground truth at identical stamps, with no alignment because the start pose is
+    known. RPE is measured over 1 m segments of ground-truth travel. Smoothness is the mean
+    |curvature| and the integral of curvature squared along the driven ground-truth path
+    resampled every 5 cm, so turning in place counts as unsmooth. Plan turning is the summed
+    heading change of the first global plan (A*'s 45-degree zig-zags compared with Theta*'s
+    any-angle segments). Time to goal is averaged over successful runs only.
+29. **Known result, not fixed:** in 1 of 3 blocked-path runs with Theta* + DWA, the robot used
+    all 4 attempts. DWA kept stopping close to the dropped wall (blocked, then
+    start_in_collision), and the 0.3 m back-up was not enough to break the cycle. More attempts or
+    a longer back-up would probably pass, but tuning on the evaluation set would overfit it.
+    The result is reported as measured.
+30. **Launch-test budgets**: a goal within 60 s with ATE RMSE < 0.05 m and max < 0.15 m (Theta* +
+    DWA, seed 7). For recovery, a goal within 90 s after at least one recovery (A* + pure pursuit,
+    which cannot avoid the wall locally, so recovery is certain). The eval measured 24 s and
+    0.004-0.012 m ATE on the clear map, and 32-42 s on the blocked path, so the budgets leave
+    margin for slow CI machines.
