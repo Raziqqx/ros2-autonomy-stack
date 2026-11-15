@@ -8,6 +8,7 @@ Needs numpy, matplotlib and pillow.
 """
 import csv
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -73,7 +74,9 @@ def main(run_dir, out, fps=8, step_s=0.5):
         current = [i for pt, i in plan_times if pt <= t]
         pts = np.array(plans[current[-1]][1]) if current else np.empty((0, 2))
         plan_ln.set_data(pts[:, 0] if len(pts) else [], pts[:, 1] if len(pts) else [])
-        last = [e for et, e in events if et <= t and not e.startswith("navigate")]
+        # The recorder stops at the final event, slightly after the last pose.
+        horizon = math.inf if t >= t_end else t
+        last = [e for et, e in events if et <= horizon and not e.startswith("navigate")]
         title.set_text(f"t = {t - traj['t'][0]:5.1f} s   {last[-1] if last else ''}")
         return plan_ln, gt_ln, est_ln, robot, title
 

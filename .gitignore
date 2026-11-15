@@ -8,3 +8,5 @@ __pycache__/
 # eval_runs.csv / eval_summary.md are committed.
 results/runs/
 results/demo/run/ros_log/
+# The demo bag is committed (7.5 MB < 10 MB limit); regenerate with `make demo`.
+!results/demo/run/bag/*.mcap

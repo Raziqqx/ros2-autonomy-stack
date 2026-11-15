@@ -166,3 +166,8 @@ Decisions taken without asking, with the reason. Newest at the bottom.
     which cannot avoid the wall locally, so recovery is certain). The eval measured 24 s and
     0.004-0.012 m ATE on the clear map, and 32-42 s on the blocked path, so the budgets leave
     margin for slow CI machines.
+31. **Demo**: `make demo` records the blocked-path run (A* + pure pursuit, seed 7) with
+    `ros2 bag record` (MCAP, 7.5 MB, so it is committed under `results/demo/run/bag`) and
+    the recorder's CSVs. `make gif` renders `docs/demo.gif` from those CSVs with matplotlib
+    on the host (`GIF_PYTHON` must have numpy, matplotlib and pillow), so the image does not
+    carry a plotting stack. `make reproduce` = eval + demo + gif.

@@ -1,0 +1,17 @@
+t,event
+2.059,mission_start GoTo
+2.059,navigate 10.20 6.60
+11.357,blocked
+11.357,recovery_start
+15.358,recovery_done
+15.358,navigate 10.20 6.60
+17.657,planner_failed start_in_collision
+17.657,recovery_start
+21.657,recovery_done
+21.658,navigate 10.20 6.60
+23.658,planner_failed start_in_collision
+23.658,recovery_start
+27.656,recovery_done
+27.657,navigate 10.20 6.60
+54.157,goal_reached 10.20 6.60
+54.157,mission_success

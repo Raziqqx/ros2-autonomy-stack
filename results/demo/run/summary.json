@@ -1,0 +1,19 @@
+{
+ "success": 1,
+ "time_to_goal": 52.09837973699905,
+ "recoveries": 3,
+ "planner_failures": 2,
+ "blocked_events": 1,
+ "final_goal_dist": 0.14947125564546684,
+ "duration": 52.1484387169985,
+ "ate_rmse": 0.003520592812673528,
+ "ate_max": 0.014049032735997117,
+ "heading_rmse": 0.005679913637618841,
+ "rpe_trans": 0.006173862055572923,
+ "rpe_rot": 0.00765744823922309,
+ "driven_length": 13.05711506795651,
+ "mean_abs_curv": 1.7373585218090088,
+ "int_curv_sq": 589.0684118620997,
+ "plan_length": 11.37990793243875,
+ "plan_turn": 6.28318530718064
+}
