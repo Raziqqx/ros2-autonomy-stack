@@ -6,8 +6,6 @@ that goes to goals, patrols and docks in a 12 x 9 m warehouse. It covers state e
 control (pure pursuit and DWA) and task execution with a BehaviorTree.CPP v4 behaviour tree that
 recovers when the path is blocked. Everything builds and runs headless in Docker.
 
-**Start here: [docs/GUIDE.md](docs/GUIDE.md)** (how the code works, file by file, in plain English).
-
 ## Why it's hard
 
 - **Robust navigation means getting every layer right at once.** Odometry drifts, so the EKF has
@@ -143,20 +141,8 @@ The behaviour tree ran a recovery in 11 runs. The robot reached the goal in 10 o
   colcon job in `ros:jazzy-ros-base`. It has only been exercised locally through the same
   `make` targets.
 
-## Target roles
-
-- **Griffin Labs (LionsBot): autonomy software.** This project covers ROS 2, localisation and
-  mapping, path planning, state estimation, control loops and behaviour-tree task execution,
-  with tests.
-- **HTX RAUS: unmanned systems.** This project covers ROS 2, motion planning and
-  simulation-based evaluation of autonomy.
-- **PSA (secondary).** This project covers modular simulation components and operational logic
-  in C++ and Python.
-
 ## More
 
 - [docs/FEATURES.md](docs/FEATURES.md): tech stack and a feature-by-feature explainer.
 - [docs/DESIGN.md](docs/DESIGN.md): decisions, trade-offs and the baseline vs improved comparison.
-- [docs/INTERVIEW_NOTES.md](docs/INTERVIEW_NOTES.md): likely interview questions with answers.
-- [RESUME_BULLETS.md](RESUME_BULLETS.md): resume bullets with measured numbers.
 - [DECISIONS.md](DECISIONS.md): the full decision log.
