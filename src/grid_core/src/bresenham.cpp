@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 
 #include "grid_core/grid.hpp"

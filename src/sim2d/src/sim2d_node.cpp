@@ -15,6 +15,7 @@
 // `drop_after_m` drops a wall across the robot's path once it has driven
 // that far (blocked-path / recovery scenario). The true world is published on
 // /sim/world (latched) for evaluation plots.
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -217,7 +218,8 @@ private:
                 const double dx = wx - cx, dy = wy - cy;
                 const double u = std::cos(yaw) * dx + std::sin(yaw) * dy;
                 const double v = -std::sin(yaw) * dx + std::cos(yaw) * dy;
-                if (std::abs(u) <= 0.5 * sx && std::abs(v) <= 0.5 * sy) map_.occupied[g.index(c)] = 1;
+                if (std::abs(u) <= 0.5 * sx && std::abs(v) <= 0.5 * sy)
+                    map_.occupied[g.index(c)] = 1;
             }
         }
     }
@@ -245,7 +247,8 @@ private:
         msg.info.origin.position.y = g.origin_y;
         msg.info.origin.orientation.w = 1.0;
         msg.data.resize(map_.occupied.size());
-        for (std::size_t i = 0; i < map_.occupied.size(); ++i) msg.data[i] = map_.occupied[i] ? 100 : 0;
+        for (std::size_t i = 0; i < map_.occupied.size(); ++i)
+            msg.data[i] = map_.occupied[i] ? 100 : 0;
         world_pub_->publish(msg);
     }
 

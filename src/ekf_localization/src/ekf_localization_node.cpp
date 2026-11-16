@@ -4,6 +4,7 @@
 // Subscribes:  /odom (nav_msgs/Odometry; only the twist is used), /imu, /scan
 // Publishes:   /ekf/pose (geometry_msgs/PoseWithCovarianceStamped, map frame)
 //              TF map->odom, so map->odom->base_link gives the EKF pose.
+#include <algorithm>
 #include <ekf_core/ekf.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
