@@ -6,6 +6,8 @@ that goes to goals, patrols and docks in a 12 x 9 m warehouse. It covers state e
 control (pure pursuit and DWA) and task execution with a BehaviorTree.CPP v4 behaviour tree that
 recovers when the path is blocked. Everything builds and runs headless in Docker.
 
+**Start here: [docs/GUIDE.md](docs/GUIDE.md)** (how the code works, file by file, in plain English).
+
 ## Why it's hard
 
 - **Robust navigation means getting every layer right at once.** Odometry drifts, so the EKF has
@@ -28,7 +30,8 @@ The demo uses A* with pure pursuit and seed 7. After the robot has driven 2 m, a
 appears 0.45 m in front of it. The behaviour tree backs up, rotates and replans, and the robot
 reaches the goal. In the recorded run (`results/demo/run/summary.json`), it needed 3 recoveries
 and arrived in 52.1 s, with an EKF position error (ATE RMSE) of 0.0035 m. The MCAP rosbag is in
-`results/demo/run/bag/`.
+`results/demo/run/bag/`. Runs use wall-clock timers, so a re-run gives slightly different
+numbers: a check re-run on 2026-11-16 needed 1 recovery and arrived in 36.3 s.
 
 To re-record it, run these commands:
 
@@ -56,6 +59,10 @@ To run the full stack yourself inside `make docker-shell`:
 ros2 launch autonomy_bringup navigation.launch.py planner:=thetastar controller:=dwa tree:=Patrol
 ```
 
+The `task_bt` lines print each step (`navigate 5.00 3.20`, `goal_reached ...`) and end with
+`mission_success` after about a minute. Without `record_dir` the nodes keep running, so press
+Ctrl+C to stop them.
+
 The launch arguments are listed below.
 
 | Argument | Options |
@@ -67,8 +74,24 @@ The launch arguments are listed below.
 | `clutter_count` | random boxes that are not in the prior map |
 | `drop_after_m` | drops a wall in front of the robot after this distance |
 | `seed` | seeds the simulator's noise |
-| `rviz:=true` | opens RViz with the bundled config |
+| `rviz:=true` | opens RViz with the bundled config (needs a ROS 2 desktop install and a display; `rviz2` is not in the Docker image) |
 | `record_dir` / `record_bag` | records the run's CSVs and a rosbag |
+
+## See it working
+
+1. **Watch the recorded run.** Open `docs/demo.gif` (or view it at the top of this README). You
+   should see the warehouse map, a wall appearing in front of the robot, the robot backing up
+   and turning, a new green plan, and the blue (true) and orange (EKF) tracks reaching the goal.
+2. **Run the unit tests.** `make native-test` should end with
+   `100% tests passed, 0 tests failed out of 67`.
+3. **Run the whole stack once.** `rm -rf results/demo/run/bag && make demo` takes under a minute
+   after the image is built. The log should show `event: mission_start GoTo`, a
+   `recovery_start`, and finally `event: mission_success` and `run recorded: {'success': 1, ...}`.
+   The new `results/demo/run/summary.json` holds that run's metrics.
+4. **Draw your own GIF.** `pip install numpy matplotlib pillow`, then `make gif`. It prints
+   `wrote docs/demo.gif (N frames)`. Open the file to see the run you just recorded.
+5. **Read the measured results.** Open `results/eval_summary.md`: the tables from the 60-run
+   evaluation that the numbers below come from.
 
 ## Key results
 

@@ -171,3 +171,9 @@ Decisions taken without asking, with the reason. Newest at the bottom.
     the recorder's CSVs. `make gif` renders `docs/demo.gif` from those CSVs with matplotlib
     on the host (`GIF_PYTHON` must have numpy, matplotlib and pillow), so the image does not
     carry a plotting stack. `make reproduce` = eval + demo + gif.
+32. **Final check (2026-11-16)**: the demo command was re-run once into a scratch folder, not
+    into `results/`, so the recorded run and the numbers quoted from it stay unchanged (the
+    re-run needed 1 recovery and 36.3 s; the README now says re-runs differ). `rviz2` is not
+    in the ros-base image, so the README marks `rviz:=true` as needing a desktop install
+    rather than adding ~1 GB to the image. No screenshot was added: there is no GUI in the
+    image, and `docs/demo.gif` already shows the run.

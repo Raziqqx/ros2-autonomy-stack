@@ -4,7 +4,7 @@
 
 | Language / framework / tool | What it is used for in this project |
 |---|---|
-| C++17 with rclcpp | All the ROS nodes and the five ROS-free maths libraries |
+| C++20 with rclcpp | All the ROS nodes and the five ROS-free maths libraries |
 | ROS 2 Jazzy (`ros:jazzy-ros-base`) | Topics, parameters, TF, launch files and rosbag2 |
 | BehaviorTree.CPP v4 | Mission logic (`GoTo`, `Dock`, `Patrol`) and recovery when blocked |
 | CMake, ament_cmake and colcon | Builds the workspace. Each `*_core` package also builds as plain CMake |
